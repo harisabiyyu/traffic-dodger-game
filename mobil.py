@@ -43,10 +43,10 @@ lives = 3
 line_y = 0
 
 # Load gambar
-player_img = pygame.image.load("mobil.png.jpeg")
-enemy_img = pygame.image.load("musuh.png.jpeg")
+player_img = pygame.image.load("player_car.png")
+enemy_img = pygame.image.load("enemy_car.png")
 coin_img = pygame.image.load("coin.png")
-heart = pygame.image.load("nyawa.png")
+heart = pygame.image.load("heart.png")
 coin_sound = pygame.mixer.Sound("coin.wav")
 crash_sound = pygame.mixer.Sound("crash.wav")
 engine_sound = pygame.mixer.Sound("engine.mp3")
