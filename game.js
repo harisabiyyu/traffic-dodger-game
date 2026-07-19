@@ -25,10 +25,11 @@ const crashSound = new Audio("crash.wav");
 const engineSound = new Audio("engine.mp3");
 
 engineSound.loop = true;
+engineSound.volume = 1;
 
 function startSound(){
 
-    engineSound.volume = 0.3;
+    engineSound.volume = 1;
 
     engineSound.play().catch(()=>{});
 
@@ -57,7 +58,7 @@ document.addEventListener(
 
 let player = {
     x: 195,
-    y: 650,
+    y: 520,
     width: 70,
     height: 120,
     speed: 6
@@ -111,7 +112,11 @@ let highScore =
 let gameOver = false;
 let gameStarted = false;
 
-let enemySpeed = 2.5;
+let isMobile = /Android||iphone|ipad/i.test(
+    navigator.userAgent
+);
+
+let enemySpeed = isMobile ? 4 : 2.5;
 
 let lineY = 0;
 
@@ -177,13 +182,13 @@ function update() {
         player.x = 340;
 
     // Garis jalan
-    lineY += 5;
+    lineY += isMobile ? 8 : 5;
 
     if (lineY > 120)
         lineY = 0;
 
     // Koin
-    coin.y += 3;
+    coin.y += isMobile ? 4 : 3;
 
     if (coin.y > canvas.height) {
 
@@ -518,6 +523,8 @@ canvas.addEventListener(
     "click",
     () => {
         gameStarted = true;
+
+    engineSound.play().catch(()=>{});
     }
 );
 
@@ -525,6 +532,8 @@ canvas.addEventListener(
     "touchstart",
     () => {
         gameStarted = true;
+
+    engineSound.play().catch(()=>{});
     }
 );
 
