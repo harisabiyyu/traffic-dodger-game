@@ -37,7 +37,7 @@ function startSound(){
         startSound
     );
 
-    document.removeEventListerner(
+    document.removeEventListener(
         "touchstart",
         startSound
     );
@@ -58,8 +58,8 @@ document.addEventListener(
 let player = {
     x: 195,
     y: 650,
-    width: 60,
-    height: 100,
+    width: 70,
+    height: 120,
     speed: 6
 };
 
@@ -70,8 +70,8 @@ let enemies = [
     {
         x: 80,
         y: -100,
-        width: 60,
-        height: 100
+        width:70,
+        height: 120
     },
 
     {
@@ -105,7 +105,11 @@ let score = 0;
 let level = 1;
 let lives = 3;
 
+let highScore =
+    localStorage.getItem("highScore") || 0;
+
 let gameOver = false;
+let gameStarted = false;
 
 let enemySpeed = 2.5;
 
@@ -146,13 +150,11 @@ canvas.addEventListener("touchmove", (e) => {
 function hit(a, b) {
 
     return (
-
-        a.x < b.x + b.width &&
-        a.x + a.width > b.x &&
-        a.y < b.y + b.height &&
-        a.y + a.height > b.y
-
-    );
+    a.x + 12 < b.x + b.width - 12 &&
+    a.x + a.width - 12 > b.x + 12 &&
+    a.y + 15 < b.y + b.height - 15 &&
+    a.y + a.height - 15 > b.y + 15
+);
 
 }
 
@@ -175,7 +177,7 @@ function update() {
         player.x = 340;
 
     // Garis jalan
-    lineY += 8;
+    lineY += 5;
 
     if (lineY > 120)
         lineY = 0;
@@ -207,12 +209,23 @@ function update() {
                 Math.random() * 280;
 
             score++;
+
+            if(score > highScore) {
+                highScore = score;
+                localStorage.setItem("highScore",highScore);
+            }
         }
 
         if (hit(player, enemy)) {
 
             crashSound.currentTime = 0;
             crashSound.play();
+
+            if(navigator.vibrate){
+
+            navigator.vibrate(200);
+
+            }
 
             lives--;
 
@@ -233,6 +246,11 @@ function update() {
         coinSound.play();
 
         score += 5;
+
+        if(score > highScore){
+            highScore = score;
+            localStorage.setItem("highScore",highScore);
+        }
 
         coin.y = -200;
 
@@ -338,8 +356,8 @@ ctx.fillRect(
             enemyImg,
             enemy.x,
             enemy.y,
-            60,
-            100
+            70,
+            120
         );
 
     }
@@ -351,8 +369,8 @@ ctx.fillRect(
         playerImg,
         player.x,
         player.y,
-        60,
-        100
+        70,
+        120
     );
 
     // Score
@@ -373,23 +391,28 @@ ctx.fillRect(
         70
     );
 
+    ctx.fillText(
+    "Best : " + highScore,
+    10,
+    105
+    );
+
     // Heart
 
     for (let i = 0; i < lives; i++) {
 
         ctx.drawImage(
             heartImg,
-            10 + i * 40,
-            90,
+            170 + i * 40,
+            10,
             30,
             30
         );
 
     }
-
+    
     // Game Over
-
-    if(gameOver){
+if(gameOver){
 
     ctx.fillStyle =
         "rgba(0,0,0,0.7)";
@@ -410,11 +433,9 @@ ctx.fillRect(
         "GAME OVER",
         40,
         330
-        
     );
 
     // tombol
-
     ctx.fillStyle =
         "#00cc66";
 
@@ -436,8 +457,51 @@ ctx.fillRect(
         135,
         467
     );
-
 }
+
+
+// ================= START SCREEN =================
+
+if(!gameStarted){
+
+    ctx.fillStyle =
+        "rgba(0,0,0,0.8)";
+
+    ctx.fillRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+    ctx.fillStyle =
+        "white";
+
+    ctx.textAlign =
+        "center";
+
+    ctx.font =
+        "45px Arial";
+
+    ctx.fillText(
+        "TRAFFIC DODGER",
+        canvas.width / 2,
+        320
+    );
+
+    ctx.font =
+        "30px Arial";
+
+    ctx.fillText(
+        "Tap To Start",
+        canvas.width / 2,
+        390
+    );
+
+    ctx.textAlign =
+        "left";
+}
+    
 }
 
 canvas.addEventListener(
@@ -450,13 +514,27 @@ canvas.addEventListener(
     restartGame
 );
 
+canvas.addEventListener(
+    "click",
+    () => {
+        gameStarted = true;
+    }
+);
+
+canvas.addEventListener(
+    "touchstart",
+    () => {
+        gameStarted = true;
+    }
+);
+
 function restartGame(e){
 
     if(!gameOver)
         return;
 
     location.reload();
-
+    
 }
 
 
@@ -465,7 +543,7 @@ function restartGame(e){
 
 function gameLoop() {
 
-    if (!gameOver) {
+    if (gameStarted && ! gameOver) {
         update ();
     }
     draw();
